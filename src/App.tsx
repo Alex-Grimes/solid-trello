@@ -20,7 +20,7 @@ const App: Component = () => {
 
   return (
     <div class='container' style={{ padding: '50px 0 100px 0' }}>
-      {!session() ? <Auth /> : <Account session={session()!} />}
+      {!session() ? <Auth /> : <Home />}
     </div>
   );
 };
