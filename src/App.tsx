@@ -3,7 +3,7 @@ import { supabase } from '../src/services/auth';
 import { AuthSession } from '@supabase/supabase-js';
 import Account from '../src/components/account';
 import Auth from '../src/components/login';
-import Home from '../src/pages/Home';
+import Home from './pages/Home';
 
 const App: Component = () => {
   const [session, setSession] = createSignal<AuthSession | null>(null);
@@ -20,7 +20,7 @@ const App: Component = () => {
 
   return (
     <div class='container' style={{ padding: '50px 0 100px 0' }}>
-      {!session() ? <Auth /> : <Home />}
+      {!session() ? <Auth /> : <Account session={session()!} />}
     </div>
   );
 };

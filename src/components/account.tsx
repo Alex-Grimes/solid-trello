@@ -1,6 +1,7 @@
 import { AuthSession } from '@supabase/supabase-js';
 import { Component, createEffect, createSignal } from 'solid-js';
 import { supabase } from '../services/auth';
+import Avatar from './avatar';
 
 interface Props {
   session: AuthSession;
@@ -22,7 +23,7 @@ const Account: Component<Props> = ({ session }) => {
       const { user } = session;
 
       let { data, error, status } = await supabase
-        .from('profiles')
+        .from('users')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
         .single();
@@ -60,7 +61,7 @@ const Account: Component<Props> = ({ session }) => {
         updated_at: new Date().toISOString(),
       };
 
-      let { error } = await supabase.from('profiles').upsert(updates);
+      let { error } = await supabase.from('users').upsert(updates);
 
       if (error) {
         throw error;
@@ -77,6 +78,14 @@ const Account: Component<Props> = ({ session }) => {
   return (
     <div aria-live='polite'>
       <form onSubmit={updateProfile} class='form-widget'>
+        <Avatar
+          url={avatarUrl()}
+          size={150}
+          onUpload={(e: Event, url: string) => {
+            setAvatarUrl(url);
+            updateProfile(e);
+          }}
+        />
         <div>Email: {session.user.email}</div>
         <div>
           <label for='username'>Name</label>
