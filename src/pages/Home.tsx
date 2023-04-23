@@ -6,17 +6,9 @@ import {
   Switch,
   Match,
 } from 'solid-js';
-import { supabase } from '../services/auth';
-
-const getBoards = supabase.from('user_boards').select(`
-boards:board_id ( title, id )
-`);
+import { boards } from '../App';
 
 const Home: Component = () => {
-  const [boards] = createResource(getBoards);
-
-  console.log(boards());
-
   return (
     <div>
       <Switch fallback={<div>Not Found</div>}>

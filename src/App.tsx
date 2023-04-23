@@ -6,15 +6,37 @@ import Auth from '../src/components/login';
 import Home from './pages/Home';
 
 const App: Component = () => {
+  const [boards, setBoards] = createSignal<[]>([]);
   const [session, setSession] = createSignal<AuthSession | null>(null);
+  const [loading, setLoading] = createSignal(true);
+
+  const getBoards = async () => {
+    try {
+      setLoading(true);
+
+      let { data, error, status } = await supabase
+        .from('user_boards')
+        .select(`boards:board_id ( title, id )`);
+      if (error && status !== 406) {
+        throw error;
+      }
+
+      if (data) {
+        setBoards(data);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   createEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      getBoards();
     });
   });
 
@@ -24,5 +46,7 @@ const App: Component = () => {
     </div>
   );
 };
+
+export { boards };
 
 export default App;
