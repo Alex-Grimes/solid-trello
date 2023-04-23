@@ -5,41 +5,45 @@ import Account from '../src/components/account';
 import Auth from '../src/components/login';
 import Home from './pages/Home';
 
-const App: Component = () => {
-  const [boards, setBoards] = createSignal<[]>([]);
-  const [session, setSession] = createSignal<AuthSession | null>(null);
-  const [loading, setLoading] = createSignal(true);
+const [boards, setBoards] = createSignal<any>();
+const [loading, setLoading] = createSignal(true);
+const [session, setSession] = createSignal<AuthSession | null>(null);
 
-  const getBoards = async () => {
-    try {
-      setLoading(true);
+const getBoards = async () => {
+  try {
+    setLoading(true);
 
-      let { data, error, status } = await supabase
-        .from('user_boards')
-        .select(`boards:board_id ( title, id )`);
-      if (error && status !== 406) {
-        throw error;
-      }
-
-      if (data) {
-        setBoards(data);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      }
-    } finally {
-      setLoading(false);
+    let { data, error, status } = await supabase
+      .from('user_boards')
+      .select(`boards:board_id ( title, id )`);
+    if (error && status !== 406) {
+      throw error;
     }
-  };
 
-  createEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      getBoards();
-    });
+    if (data) {
+      console.log(data);
+      setBoards(data);
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      alert(error.message);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
+createEffect(() => {
+  getBoards();
+});
+
+createEffect(async () => {
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setSession(session);
   });
+});
 
+const App: Component = () => {
   return (
     <div class='container' style={{ padding: '50px 0 100px 0' }}>
       {!session() ? <Auth /> : <Home />}

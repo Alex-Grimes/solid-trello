@@ -1,29 +1,12 @@
-import {
-  createEffect,
-  createSignal,
-  Component,
-  createResource,
-  Switch,
-  Match,
-} from 'solid-js';
+import { Component, For } from 'solid-js';
 import { boards } from '../App';
+
+//console.log(boards());
 
 const Home: Component = () => {
   return (
-    <div>
-      <Switch fallback={<div>Not Found</div>}>
-        <Match
-          when={boards.state === 'pending' || boards.state === 'unresolved'}
-        >
-          Loading...
-        </Match>
-        <Match when={boards.state === 'ready'}>
-          {JSON.stringify(boards())}
-        </Match>
-        <Match when={boards.state === 'errored'}>
-          {JSON.stringify(boards.error)}
-        </Match>
-      </Switch>
+    <div class='text-white'>
+      <For each={boards()}>{(board) => <p>{board.title}</p>}</For>
     </div>
   );
 };
