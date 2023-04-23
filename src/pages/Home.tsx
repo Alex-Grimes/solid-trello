@@ -1,8 +1,42 @@
 import { Component, For } from 'solid-js';
 import { boards } from '../App';
+import { supabase } from '../services/auth';
+import { createSignal } from 'solid-js';
 
-//console.log(boards());
+const [avatarUrl, setAvatarUrl] = createSignal<any | null>(null);
 
+const downloadImage = async (path: string) => {
+  try {
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .download(path);
+    if (error) {
+      throw error;
+    }
+    const url = URL.createObjectURL(data);
+    setAvatarUrl(url);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log('Error downloading image: ', error.message);
+    }
+  }
+};
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+let { data } = await supabase
+  .from('users')
+  .select(`avatar_url`)
+  .eq('id', user.id)
+  .single();
+
+if (data) {
+  downloadImage(data.avatar_url);
+}
+
+console.log(user);
 const Home: Component = () => {
   return (
     <div class='container'>
@@ -19,9 +53,14 @@ const Home: Component = () => {
               </link>
             </div>
             <div class='ml-10 flex items-center space-x-4'>
-              {/* <span class="text-white">{{}(user | async)?.email}}</span> */}
-              <img />
-
+              <span class='text-white'>{user?.email}</span>
+              {avatarUrl() && (
+                <img
+                  class='rounded-full h-8 w-8 object-cover'
+                  style={{ height: `50px`, width: `50px` }}
+                  src={`${avatarUrl()}`}
+                />
+              )}
               <button
                 //(click)="signOut()"
                 class='inline-block rounded-md border border-transparent bg-white py-1 px-4 text-base font-medium text-emerald-600 hover:bg-emerald-50'
