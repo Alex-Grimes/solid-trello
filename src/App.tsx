@@ -34,7 +34,7 @@ const getBoards = async () => {
 };
 
 createEffect(() => {
-  getBoards();
+  //getBoards();
 });
 
 createEffect(async () => {
