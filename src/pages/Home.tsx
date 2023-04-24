@@ -1,5 +1,4 @@
 import { Component, For } from 'solid-js';
-import { boards } from '../App';
 import { supabase } from '../services/auth';
 import { createSignal } from 'solid-js';
 
@@ -36,7 +35,36 @@ if (data) {
   downloadImage(data.avatar_url);
 }
 
-console.log(user);
+let getBoards = async () => {
+  let boards = await supabase.from('user_boards').select(`
+  boards:board_id ( title, id )
+`);
+  return boards.data || [];
+};
+
+let startBoard = async () => {
+  const data = await supabase
+    .from('boards')
+    .insert({}, { returning: 'minimal' });
+
+  // Load all boards because we only get back minimal data
+  // Trigger needs to run first
+  // Otherwise RLS would fail
+  let boards = await getBoards();
+
+  if (boards.length > 0) {
+    const newBoard = boards.pop();
+
+    if (newBoard.boards) {
+      //router.navigateByUrl(`/workspace/${newBoard.boards.id}`)
+    }
+  }
+};
+
+let signOut = () => {
+  supabase.auth.logout();
+};
+
 const Home: Component = () => {
   return (
     <div class='container'>
