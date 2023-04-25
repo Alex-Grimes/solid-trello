@@ -61,9 +61,12 @@ let startBoard = async () => {
   }
 };
 
-let signOut = () => {
-  supabase.auth.logout();
-};
+async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error != null) {
+    console.log(error);
+  }
+}
 
 const Home: Component = () => {
   return (
@@ -90,7 +93,7 @@ const Home: Component = () => {
                 />
               )}
               <button
-                //(click)="signOut()"
+                onClick={() => signOut()}
                 class='inline-block rounded-md border border-transparent bg-white py-1 px-4 text-base font-medium text-emerald-600 hover:bg-emerald-50'
               >
                 Logout
